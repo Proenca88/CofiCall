@@ -1,0 +1,6 @@
+{
+  "name": "CofiCall",
+  "description": "Diretório de contatos de funcionários minimalista com suporte offline e favoritos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

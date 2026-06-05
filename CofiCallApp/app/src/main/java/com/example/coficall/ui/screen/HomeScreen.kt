@@ -1,0 +1,353 @@
+package com.example.coficall.ui.screen
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.CorporateFare
+import androidx.compose.material.icons.filled.Factory
+import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.coficall.model.BusinessUnit
+import com.example.coficall.model.BusinessUnitType
+import com.example.coficall.model.sampleBusinessUnits
+import com.example.coficall.theme.CoficabBlue
+import com.example.coficall.theme.CoficabRoyalBlue
+import com.example.coficall.theme.CoficabYellow
+import com.example.coficall.theme.CofiCallTheme
+import com.example.coficall.theme.LightBluePillBg
+import com.example.coficall.theme.LightGrayBg
+import com.example.coficall.theme.LightGrayBorder
+import com.example.coficall.theme.LightOfflineBg
+import com.example.coficall.theme.LightOfflineText
+import com.example.coficall.theme.NeutralMedGrey
+
+@Composable
+fun HomeScreen(
+    isOffline: Boolean = false,
+    businessUnits: List<BusinessUnit> = sampleBusinessUnits,
+    onUnitClick: (BusinessUnit) -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabTypes = listOf(BusinessUnitType.UNIT, BusinessUnitType.FACTORY, BusinessUnitType.OFFICE)
+
+    val filteredUnits = remember(selectedTab, businessUnits) {
+        val targetType = tabTypes[selectedTab]
+        businessUnits.filter { it.type == targetType }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Top Bar com Logo e Sinc
+        HomeTopBar()
+
+        // Tab Row Ovals
+        HomeTabRow(
+            selectedTab = selectedTab,
+            onTabSelected = { selectedTab = it }
+        )
+
+        // Offline Banner
+        if (isOffline) {
+            OfflineBanner()
+        }
+
+        // Section Title
+        val sectionTitle = when (tabTypes[selectedTab]) {
+            BusinessUnitType.UNIT -> "UNIDADES DE NEGÓCIO"
+            BusinessUnitType.FACTORY -> "UNIDADES DA FÁBRICA"
+            BusinessUnitType.OFFICE -> "ESCRITÓRIOS"
+        }
+        Text(
+            text = sectionTitle,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+        )
+
+        // Business Units List (Cards format)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp),
+        ) {
+            if (filteredUnits.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Sem unidades disponíveis nesta categoria.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = NeutralMedGrey
+                        )
+                    }
+                }
+            } else {
+                items(filteredUnits, key = { it.id }) { unit ->
+                    BusinessUnitCard(unit = unit, onClick = { onUnitClick(unit) })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeTopBar(modifier: Modifier = Modifier) {
+    val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
+    val color = if (isDark) CoficabYellow else CoficabRoyalBlue
+    
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.CorporateFare,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(28.dp)
+                )
+                Text(
+                    text = "CofiCall",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isDark) Color.White else CoficabRoyalBlue,
+                    letterSpacing = (-0.5).sp
+                )
+            }
+            IconButton(onClick = {}) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "Sincronizar",
+                    tint = if (isDark) Color.White else CoficabRoyalBlue,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeTabRow(
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val tabs = listOf("Unidades", "Fábricas", "Escritórios")
+    val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
+    
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        tabs.forEachIndexed { index, text ->
+            val isSelected = selectedTab == index
+            
+            val containerColor = if (isSelected) {
+                if (isDark) CoficabYellow else CoficabRoyalBlue
+            } else {
+                if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else LightGrayBg
+            }
+            
+            val contentColor = if (isSelected) {
+                if (isDark) CoficabBlue else Color.White
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
+            
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(containerColor)
+                    .clickable { onTabSelected(index) }
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = contentColor
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OfflineBanner(modifier: Modifier = Modifier) {
+    val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
+    
+    val containerColor = if (isDark) CoficabYellow.copy(alpha = 0.15f) else LightOfflineBg
+    val contentColor = if (isDark) CoficabYellow else LightOfflineText
+    
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        color = containerColor,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Filled.CloudOff,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = "A trabalhar offline. Última sincronização há 2m.",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = contentColor,
+            )
+        }
+    }
+}
+
+@Composable
+fun BusinessUnitCard(
+    unit: BusinessUnit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
+    val cardBorderColor = if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.5f) else LightGrayBorder
+    val primaryColor = if (isDark) CoficabYellow else CoficabRoyalBlue
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, cardBorderColor)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Icon redondo de acordo com tipo
+            val iconBg = if (unit.type == BusinessUnitType.FACTORY) {
+                if (isDark) MaterialTheme.colorScheme.secondaryContainer else LightBluePillBg
+            } else {
+                primaryColor
+            }
+            
+            val iconColor = if (unit.type == BusinessUnitType.FACTORY) {
+                primaryColor
+            } else {
+                if (isDark) CoficabBlue else Color.White
+            }
+            
+            val icon = if (unit.type == BusinessUnitType.FACTORY) {
+                Icons.Filled.Hub
+            } else {
+                Icons.Filled.Factory
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(iconBg),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = unit.shortName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = unit.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = "${unit.collaboratorCount}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryColor,
+                )
+                Text(
+                    text = if (unit.collaboratorCount == 1) "COLABORADOR" else "COLABORADORES",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenPreview() {
+    CofiCallTheme { HomeScreen() }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenDarkPreview() {
+    CofiCallTheme(darkTheme = true) { HomeScreen(isOffline = true) }
+}
