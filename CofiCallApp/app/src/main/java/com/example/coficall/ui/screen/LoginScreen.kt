@@ -1,8 +1,12 @@
 package com.example.coficall.ui.screen
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.painterResource
+import com.example.coficall.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,6 +44,7 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onLoginExecute: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, cb -> cb(Result.success(Unit)) },
     onRegisterExecute: (String, String, (Result<Unit>) -> Unit) -> Unit = { _, _, cb -> cb(Result.success(Unit)) },
+    onForgotPasswordExecute: (String, (Result<Unit>) -> Unit) -> Unit = { _, cb -> cb(Result.success(Unit)) },
     modifier: Modifier = Modifier,
 ) {
     var email by remember { mutableStateOf("") }
@@ -47,7 +52,22 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    
+    var showResetSuccessDialog by remember { mutableStateOf(false) }
+    var rememberMe by remember { mutableStateOf(false) }
+
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val prefs = remember(context) { context.getSharedPreferences("login_prefs", android.content.Context.MODE_PRIVATE) }
+
+    LaunchedEffect(Unit) {
+        val savedRemember = prefs.getBoolean("remember_me", false)
+        if (savedRemember) {
+            email = prefs.getString("saved_email", "") ?: ""
+            password = prefs.getString("saved_password", "") ?: ""
+            rememberMe = true
+        }
+    }
+
     // Novo estado para controlar se está em modo de registro (criação de conta)
     var isRegisterMode by remember { mutableStateOf(false) }
 
@@ -82,14 +102,14 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Logo / Branding vertical alinhado com o design
-            Icon(
-                imageVector = Icons.Filled.CorporateFare,
-                contentDescription = null,
-                tint = if (isDark) CoficabYellow else CoficabRoyalBlue,
+            Image(
+                painter = painterResource(id = R.drawable.app_logo),
+                contentDescription = "CofiCall Logo",
                 modifier = Modifier
-                    .size(68.dp)
-                    .padding(bottom = 8.dp)
+                    .size(90.dp)
+                    .padding(bottom = 12.dp)
             )
+
             
             Text(
                 text = "Cofi",
@@ -178,6 +198,35 @@ fun LoginScreen(
                 ),
             )
 
+            // Guardar Credenciais Checkbox
+            if (!isRegisterMode) {
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = rememberMe,
+                        onCheckedChange = { rememberMe = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = buttonColor,
+                            uncheckedColor = labelColor,
+                            checkmarkColor = if (isDark) CoficabBlue else Color.White
+                        )
+                    )
+                    Text(
+                        text = "Guardar Credenciais",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = titleTextColor,
+                        modifier = Modifier
+                            .clickable { rememberMe = !rememberMe }
+                            .padding(start = 4.dp)
+                    )
+                }
+            }
+
             // Error message
             AnimatedVisibility(visible = errorMessage != null) {
                 Text(
@@ -207,6 +256,19 @@ fun LoginScreen(
                             action(email, password) { result ->
                                 isLoading = false
                                 if (result.isSuccess) {
+                                    if (!isRegisterMode) {
+                                        prefs.edit().apply {
+                                            putBoolean("remember_me", rememberMe)
+                                            if (rememberMe) {
+                                                putString("saved_email", email)
+                                                putString("saved_password", password)
+                                            } else {
+                                                remove("saved_email")
+                                                remove("saved_password")
+                                            }
+                                            apply()
+                                        }
+                                    }
                                     onLoginSuccess()
                                 } else {
                                     val err = result.exceptionOrNull()
@@ -258,7 +320,28 @@ fun LoginScreen(
                 }
             } else {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    TextButton(onClick = {}) {
+                    TextButton(
+                        onClick = {
+                            val trimmedEmail = email.trim()
+                            if (trimmedEmail.isBlank()) {
+                                errorMessage = "Por favor, introduza o seu e-mail corporativo."
+                            } else if (!trimmedEmail.endsWith("@coficab.com")) {
+                                errorMessage = "Introduza um e-mail válido (@coficab.com)."
+                            } else {
+                                isLoading = true
+                                errorMessage = null
+                                onForgotPasswordExecute(trimmedEmail) { result ->
+                                    isLoading = false
+                                    if (result.isSuccess) {
+                                        showResetSuccessDialog = true
+                                    } else {
+                                        errorMessage = result.exceptionOrNull()?.localizedMessage ?: "Erro ao enviar e-mail de redefinição."
+                                    }
+                                }
+                            }
+                        },
+                        enabled = !isLoading
+                    ) {
                         Text(
                             text = "Esqueceu a palavra-passe?",
                             color = if (isDark) NeutralMedGrey else CoficabRoyalBlue,
@@ -296,6 +379,38 @@ fun LoginScreen(
                 lineHeight = 16.sp
             )
         }
+    }
+
+    if (showResetSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetSuccessDialog = false },
+            title = {
+                Text(
+                    text = "E-mail de Redefinição Enviado",
+                    fontWeight = FontWeight.Bold,
+                    color = if (isDark) NeutralWhite else NeutralCharcoal
+                )
+            },
+            text = {
+                Text(
+                    text = "Foi enviado um link de redefinição para o e-mail:\n$email\n\nPor favor, verifique a sua caixa de entrada.",
+                    color = if (isDark) NeutralMedGrey else NeutralCharcoal.copy(alpha = 0.8f)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showResetSuccessDialog = false }
+                ) {
+                    Text(
+                        text = "OK",
+                        color = if (isDark) CoficabYellow else CoficabRoyalBlue,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = if (isDark) DarkBackground else Color.White
+        )
     }
 }
 

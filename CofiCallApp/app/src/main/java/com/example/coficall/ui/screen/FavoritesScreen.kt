@@ -11,8 +11,7 @@ import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CorporateFare
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,11 +39,16 @@ fun FavoritesScreen(
     onMessageClick: (Collaborator) -> Unit = {},
     isOffline: Boolean = false,
     lastSyncTime: String = "há 5 min",
+    onUpdatePhoto: (String, String) -> Unit = { _, _ -> },
+    onRefresh: () -> Unit = {},
+    getString: (String) -> String = { it },
     modifier: Modifier = Modifier,
 ) {
     val favorites = remember(collaborators) {
         collaborators.filter { it.isFavorite }
     }
+
+    var selectedCollaboratorForDetail by remember { mutableStateOf<Collaborator?>(null) }
 
     Column(
         modifier = modifier
@@ -52,7 +56,7 @@ fun FavoritesScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         // Header com Logo e Refresh
-        FavoritesHeaderBar()
+        FavoritesHeaderBar(onRefresh = onRefresh)
 
         // Ecrã Content
         Column(
@@ -62,7 +66,7 @@ fun FavoritesScreen(
         ) {
             // Título Grande
             Text(
-                text = "Favoritos",
+                text = getString("favorites"),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -91,13 +95,13 @@ fun FavoritesScreen(
                         Text(text = "⭐", style = MaterialTheme.typography.displayLarge)
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = "Sem favoritos ainda",
+                            text = getString("no_favorites"),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = "Toque na estrela ⭐ num colaborador\npara adicioná-lo aqui.",
+                            text = getString("add_favorites_hint"),
                             style = MaterialTheme.typography.bodySmall,
                             color = NeutralMedGrey,
                             textAlign = TextAlign.Center,
@@ -116,17 +120,32 @@ fun FavoritesScreen(
                             onFavoriteToggle = onFavoriteToggle,
                             onPhoneClick = onPhoneClick,
                             onMessageClick = onMessageClick,
-                            showAllActions = true // Mostrar ambas as ações de Telefone/Mensagem + Estrela lado a lado
+                            onClick = { selectedCollaboratorForDetail = it },
+                            showAllActions = true
                         )
                     }
                 }
             }
         }
+
+        // Diálogo de detalhes do colaborador
+        selectedCollaboratorForDetail?.let { collaborator ->
+            CollaboratorDetailsDialog(
+                collaborator = collaborator,
+                onDismiss = { selectedCollaboratorForDetail = null },
+                onUpdatePhoto = { newBase64 ->
+                    onUpdatePhoto(collaborator.id, newBase64)
+                    selectedCollaboratorForDetail = collaborator.copy(photoUrl = newBase64)
+                },
+                onFavoriteToggle = { onFavoriteToggle(collaborator) },
+                getString = getString
+            )
+        }
     }
 }
 
 @Composable
-fun FavoritesHeaderBar(modifier: Modifier = Modifier) {
+fun FavoritesHeaderBar(onRefresh: () -> Unit, modifier: Modifier = Modifier) {
     val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
     val color = if (isDark) CoficabYellow else CoficabRoyalBlue
     
@@ -161,7 +180,7 @@ fun FavoritesHeaderBar(modifier: Modifier = Modifier) {
                     letterSpacing = (-0.5).sp
                 )
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = onRefresh) {
                 Icon(
                     imageVector = Icons.Filled.Refresh,
                     contentDescription = "Sincronizar",

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "183249446230",
+    "project_id": "coficall-pt",
+    "storage_bucket": "coficall-pt.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:183249446230:android:5db48db5b8245622e3e2f7",
+        "android_client_info": {
+          "package_name": "com.example.coficall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA00bAU9alhbqIRsQZPFcojrO29Hy6-1e0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

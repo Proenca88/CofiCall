@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import com.example.coficall.model.Collaborator
 import com.example.coficall.theme.CoficabBlue
 import com.example.coficall.theme.CoficabRoyalBlue
@@ -38,16 +46,19 @@ fun CollaboratorListItem(
     onFavoriteToggle: (Collaborator) -> Unit,
     onPhoneClick: (Collaborator) -> Unit,
     onMessageClick: (Collaborator) -> Unit,
+    onClick: (Collaborator) -> Unit = {},
     modifier: Modifier = Modifier,
     showAllActions: Boolean = false,
 ) {
+    val context = LocalContext.current
     val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
     val cardBorderColor = if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.5f) else LightGrayBorder
     
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .clickable { onClick(collaborator) },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, cardBorderColor)
@@ -131,34 +142,54 @@ fun CollaboratorListItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    if (showAllActions) {
-                        // Ambos os botões com fundo circular azul no ecrã de favoritos
-                        val buttonColor = if (isDark) MaterialTheme.colorScheme.secondaryContainer else LightBluePillBg
-                        val iconTint = if (isDark) MaterialTheme.colorScheme.primary else CoficabRoyalBlue
-                        
-                        if (collaborator.phone != null) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(buttonColor)
-                                    .clickable { onPhoneClick(collaborator) },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Phone,
-                                    contentDescription = "Ligar",
-                                    tint = iconTint,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        }
+                    val buttonColor = if (isDark) MaterialTheme.colorScheme.secondaryContainer else LightBluePillBg
+                    val iconTint = if (isDark) MaterialTheme.colorScheme.primary else CoficabRoyalBlue
+
+                    if (!collaborator.phone.isNullOrBlank()) {
+                        // Botão de Ligar (Telefone)
                         Box(
                             modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(buttonColor)
-                                    .clickable { onMessageClick(collaborator) },
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(buttonColor)
+                                .clickable {
+                                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                                        data = Uri.parse("tel:${collaborator.phone.trim()}")
+                                    }
+                                    try {
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Log.e("CofiCall", "Erro ao efetuar chamada", e)
+                                    }
+                                    onPhoneClick(collaborator)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Phone,
+                                contentDescription = "Ligar",
+                                tint = iconTint,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        // Botão de Mensagem (SMS)
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(buttonColor)
+                                .clickable {
+                                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                        data = Uri.parse("smsto:${collaborator.phone.trim()}")
+                                    }
+                                    try {
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Log.e("CofiCall", "Erro ao enviar SMS", e)
+                                    }
+                                    onMessageClick(collaborator)
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -167,35 +198,6 @@ fun CollaboratorListItem(
                                 tint = iconTint,
                                 modifier = Modifier.size(18.dp)
                             )
-                        }
-                    } else {
-                        // Modo simplificado: Um único botão no ecrã de colaboradores
-                        // Ligar se online, Mensagem se offline
-                        val iconColor = if (isDark) MaterialTheme.colorScheme.primary else CoficabRoyalBlue
-                        if (collaborator.isOnline && collaborator.phone != null) {
-                            IconButton(
-                                onClick = { onPhoneClick(collaborator) },
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Phone,
-                                    contentDescription = "Ligar",
-                                    tint = iconColor,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                        } else {
-                            IconButton(
-                                onClick = { onMessageClick(collaborator) },
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Message,
-                                    contentDescription = "Mensagem",
-                                    tint = iconColor,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
                         }
                     }
                 }
@@ -233,8 +235,15 @@ fun CollaboratorAvatar(
     ) {
         // Foto ou Iniciais
         if (!photoUrl.isNullOrBlank()) {
+            val bitmap = remember(photoUrl) {
+                if (photoUrl.startsWith("data:image") || photoUrl.length > 1000) {
+                    base64ToBitmap(photoUrl)
+                } else {
+                    null
+                }
+            }
             AsyncImage(
-                model = photoUrl,
+                model = bitmap ?: photoUrl,
                 contentDescription = name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -303,7 +312,20 @@ fun AlphabetSectionHeader(letter: String, modifier: Modifier = Modifier) {
             text = letter,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = color,
         )
+    }
+}
+
+fun base64ToBitmap(base64Str: String): Bitmap? {
+    return try {
+        val cleanStr = if (base64Str.startsWith("data:image")) {
+            base64Str.substringAfter(",")
+        } else {
+            base64Str
+        }
+        val decodedBytes = Base64.decode(cleanStr, Base64.DEFAULT)
+        BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+    } catch (e: Exception) {
+        null
     }
 }

@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Tema Base da Aplicação -->
     <style name="Theme.CofiCall" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Tema Inicial para a Splash Screen (Android 12+) -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Cor de fundo oficial azul escuro Coficab -->
+        <item name="windowSplashScreenBackground">#0D1B3E</item>
+        <!-- Ícone do launcher como ícone de splash -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <!-- Tema a aplicar após o encerramento da splash screen -->
+        <item name="postSplashScreenTheme">@style/Theme.CofiCall</item>
+    </style>
+
 </resources>

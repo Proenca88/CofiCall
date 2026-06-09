@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.example.coficall.model.BusinessUnit
 import com.example.coficall.model.BusinessUnitType
 import com.example.coficall.model.sampleBusinessUnits
+import com.example.coficall.model.DepartmentInfo
 import com.example.coficall.theme.CoficabBlue
 import com.example.coficall.theme.CoficabRoyalBlue
 import com.example.coficall.theme.CoficabYellow
@@ -41,17 +42,15 @@ import com.example.coficall.theme.NeutralMedGrey
 @Composable
 fun HomeScreen(
     isOffline: Boolean = false,
-    businessUnits: List<BusinessUnit> = sampleBusinessUnits,
+    businessUnits: List<BusinessUnit> = emptyList(),
+    departments: List<DepartmentInfo> = emptyList(),
     onUnitClick: (BusinessUnit) -> Unit = {},
+    onDepartmentClick: (DepartmentInfo) -> Unit = {},
+    onRefresh: () -> Unit = {},
+    getString: (String) -> String = { it },
     modifier: Modifier = Modifier,
 ) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabTypes = listOf(BusinessUnitType.UNIT, BusinessUnitType.FACTORY, BusinessUnitType.OFFICE)
-
-    val filteredUnits = remember(selectedTab, businessUnits) {
-        val targetType = tabTypes[selectedTab]
-        businessUnits.filter { it.type == targetType }
-    }
 
     Column(
         modifier = modifier
@@ -59,24 +58,25 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         // Top Bar com Logo e Sinc
-        HomeTopBar()
+        HomeTopBar(onRefresh = onRefresh)
 
         // Tab Row Ovals
         HomeTabRow(
             selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it }
+            onTabSelected = { selectedTab = it },
+            getString = getString
         )
 
         // Offline Banner
         if (isOffline) {
-            OfflineBanner()
+            OfflineBanner(getString = getString)
         }
 
         // Section Title
-        val sectionTitle = when (tabTypes[selectedTab]) {
-            BusinessUnitType.UNIT -> "UNIDADES DE NEGÓCIO"
-            BusinessUnitType.FACTORY -> "UNIDADES DA FÁBRICA"
-            BusinessUnitType.OFFICE -> "ESCRITÓRIOS"
+        val sectionTitle = when (selectedTab) {
+            0 -> getString("business_units_title")
+            1 -> getString("coes_title")
+            else -> getString("departments").uppercase()
         }
         Text(
             text = sectionTitle,
@@ -86,29 +86,40 @@ fun HomeScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         )
 
-        // Business Units List (Cards format)
+        // List
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 16.dp),
         ) {
-            if (filteredUnits.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Sem unidades disponíveis nesta categoria.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = NeutralMedGrey
-                        )
+            when (selectedTab) {
+                0 -> { // Unidades / Fábricas (COF PT, COF GR)
+                    val units = businessUnits.filter { it.type == BusinessUnitType.UNIT }
+                    if (units.isEmpty()) {
+                        item { EmptyStateMessage() }
+                    } else {
+                        items(units, key = { it.id }) { unit ->
+                            BusinessUnitCard(unit = unit, onClick = { onUnitClick(unit) }, getString = getString)
+                        }
                     }
                 }
-            } else {
-                items(filteredUnits, key = { it.id }) { unit ->
-                    BusinessUnitCard(unit = unit, onClick = { onUnitClick(unit) })
+                1 -> { // CoE (CoE PT, CoE GR)
+                    val coes = businessUnits.filter { it.type == BusinessUnitType.FACTORY }
+                    if (coes.isEmpty()) {
+                        item { EmptyStateMessage() }
+                    } else {
+                        items(coes, key = { it.id }) { unit ->
+                            BusinessUnitCard(unit = unit, onClick = { onUnitClick(unit) }, getString = getString)
+                        }
+                    }
+                }
+                2 -> { // Departamentos
+                    if (departments.isEmpty()) {
+                        item { EmptyStateMessage(getString("no_collaborators")) }
+                    } else {
+                        items(departments, key = { it.name }) { dept ->
+                            DepartmentCard(department = dept, onClick = { onDepartmentClick(dept) }, getString = getString)
+                        }
+                    }
                 }
             }
         }
@@ -116,7 +127,23 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeTopBar(modifier: Modifier = Modifier) {
+fun EmptyStateMessage(message: String = "Sem unidades disponíveis nesta categoria.") {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = NeutralMedGrey
+        )
+    }
+}
+
+@Composable
+fun HomeTopBar(onRefresh: () -> Unit, modifier: Modifier = Modifier) {
     val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
     val color = if (isDark) CoficabYellow else CoficabRoyalBlue
     
@@ -151,7 +178,7 @@ fun HomeTopBar(modifier: Modifier = Modifier) {
                     letterSpacing = (-0.5).sp
                 )
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = onRefresh) {
                 Icon(
                     imageVector = Icons.Filled.Refresh,
                     contentDescription = "Sincronizar",
@@ -167,9 +194,10 @@ fun HomeTopBar(modifier: Modifier = Modifier) {
 fun HomeTabRow(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
+    getString: (String) -> String,
     modifier: Modifier = Modifier,
 ) {
-    val tabs = listOf("Unidades", "Fábricas", "Escritórios")
+    val tabs = listOf(getString("factories"), getString("coe"), getString("departments"))
     val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
     
     Row(
@@ -213,7 +241,7 @@ fun HomeTabRow(
 }
 
 @Composable
-fun OfflineBanner(modifier: Modifier = Modifier) {
+fun OfflineBanner(getString: (String) -> String, modifier: Modifier = Modifier) {
     val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
     
     val containerColor = if (isDark) CoficabYellow.copy(alpha = 0.15f) else LightOfflineBg
@@ -238,7 +266,7 @@ fun OfflineBanner(modifier: Modifier = Modifier) {
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = "A trabalhar offline. Última sincronização há 2m.",
+                text = getString("offline_banner"),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = contentColor,
@@ -251,6 +279,7 @@ fun OfflineBanner(modifier: Modifier = Modifier) {
 fun BusinessUnitCard(
     unit: BusinessUnit,
     onClick: () -> Unit,
+    getString: (String) -> String,
     modifier: Modifier = Modifier,
 ) {
     val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
@@ -272,7 +301,6 @@ fun BusinessUnitCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Icon redondo de acordo com tipo
             val iconBg = if (unit.type == BusinessUnitType.FACTORY) {
                 if (isDark) MaterialTheme.colorScheme.secondaryContainer else LightBluePillBg
             } else {
@@ -316,7 +344,7 @@ fun BusinessUnitCard(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = unit.name,
+                    text = if (unit.shortName == "COF GR") "Portugal" else unit.name,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -330,7 +358,82 @@ fun BusinessUnitCard(
                     color = primaryColor,
                 )
                 Text(
-                    text = if (unit.collaboratorCount == 1) "COLABORADOR" else "COLABORADORES",
+                    text = if (unit.collaboratorCount == 1) getString("collaborator") else getString("collaborators_upper"),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DepartmentCard(
+    department: DepartmentInfo,
+    onClick: () -> Unit,
+    getString: (String) -> String,
+    modifier: Modifier = Modifier,
+) {
+    val isDark = MaterialTheme.colorScheme.background != Color(0xFFF5F7FA) && MaterialTheme.colorScheme.background != Color(0xFFF4F6FA)
+    val cardBorderColor = if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.5f) else LightGrayBorder
+    val primaryColor = if (isDark) CoficabYellow else CoficabRoyalBlue
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, cardBorderColor)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(if (isDark) MaterialTheme.colorScheme.secondaryContainer else LightBluePillBg),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Hub,
+                    contentDescription = null,
+                    tint = primaryColor,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = department.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = "CofiCab " + getString("department_field"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = "${department.collaboratorCount}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = primaryColor,
+                )
+                Text(
+                    text = if (department.collaboratorCount == 1) getString("collaborator") else getString("collaborators_upper"),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

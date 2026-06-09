@@ -52,6 +52,8 @@ fun MainTab.toNavDestination() = when (this) {
 fun CofiCallBottomBar(
     currentTab: MainTab,
     onTabSelected: (MainTab) -> Unit,
+    getString: (String) -> String,
+    language: String,
     modifier: Modifier = Modifier,
 ) {
     val items = listOf(
@@ -77,8 +79,15 @@ fun CofiCallBottomBar(
         ) {
             items.forEach { (tab, item) ->
                 val isSelected = currentTab == tab
+                val translatedLabel = when (item) {
+                    BottomNavItem.Home -> getString("home")
+                    BottomNavItem.Directory -> getString("collaborators")
+                    BottomNavItem.Favorites -> getString("favorites")
+                    BottomNavItem.Settings -> getString("settings")
+                }
                 BottomBarItem(
-                    item = item,
+                    label = translatedLabel,
+                    icon = if (isSelected) item.selectedIcon else item.unselectedIcon,
                     isSelected = isSelected,
                     onClick = { onTabSelected(tab) },
                     modifier = Modifier.weight(1f),
@@ -90,7 +99,8 @@ fun CofiCallBottomBar(
 
 @Composable
 private fun BottomBarItem(
-    item: BottomNavItem,
+    label: String,
+    icon: ImageVector,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -114,23 +124,23 @@ private fun BottomBarItem(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = item.selectedIcon,
-                    contentDescription = item.label,
+                    imageVector = icon,
+                    contentDescription = label,
                     tint = selectedColor,
                     modifier = Modifier.size(22.dp),
                 )
             }
         } else {
             Icon(
-                imageVector = item.unselectedIcon,
-                contentDescription = item.label,
+                imageVector = icon,
+                contentDescription = label,
                 tint = unselectedColor,
                 modifier = Modifier.size(22.dp),
             )
         }
         Spacer(Modifier.height(2.dp))
         Text(
-            text = item.label,
+            text = label,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
             color = if (isSelected) selectedColor else unselectedColor,

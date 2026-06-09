@@ -21,10 +21,16 @@
             </gradient>
         </aapt:attr>
     </path>
+    <!-- O Edificio (Logotipo CofiCall) -->
     <path
         android:fillColor="#FFFFFF"
-        android:fillType="nonZero"
-        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
-        android:strokeWidth="1"
-        android:strokeColor="#00000000" />
+        android:pathData="M 34,32 L 74,32 L 74,84 L 34,84 Z M 44,20 L 64,20 L 64,32 L 44,32 Z" />
+    <!-- Janelas transparentes (com a cor de fundo #0E1E38) -->
+    <path
+        android:fillColor="#0E1E38"
+        android:pathData="M 38,40 H 46 V 48 H 38 Z M 50,40 H 58 V 48 H 50 Z M 62,40 H 70 V 48 H 62 Z M 38,52 H 46 V 60 H 38 Z M 50,52 H 58 V 60 H 50 Z M 62,52 H 70 V 60 H 62 Z M 38,64 H 46 V 72 H 38 Z M 50,64 H 58 V 72 H 50 Z M 62,64 H 70 V 72 H 62 Z" />
+    <!-- Ondas de comunicacao superiores (Amarelo Coficab #FFC107) -->
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M54,14 A 38,38 0 0 1 72,23 L 69,27 A 33,33 0 0 0 54,19 Z M54,9 A 43,43 0 0 1 78,19 L 75,23 A 38,38 0 0 0 54,14 Z M54,14 A 38,38 0 0 0 36,23 L 39,27 A 33,33 0 0 1 54,19 Z M54,9 A 43,43 0 0 0 30,19 L 33,23 A 38,38 0 0 1 54,14 Z" />
 </vector>

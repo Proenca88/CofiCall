@@ -16,13 +16,23 @@ android {
         applicationId = "com.example.coficall"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:\\GitHub\\CofiCall\\coficall-release.keystore")
+            storePassword = "CofiCall2024!"
+            keyAlias = "coficall"
+            keyPassword = "CofiCall2024!"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -95,5 +105,10 @@ dependencies {
 
   // Coil (Image loading)
   implementation(libs.coil.compose)
+
+  // ExifInterface
+  implementation(libs.androidx.exifinterface)
+  implementation(libs.androidx.core.splashscreen)
 }
+
 

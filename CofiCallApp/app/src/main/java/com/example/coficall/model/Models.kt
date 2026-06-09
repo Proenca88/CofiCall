@@ -12,7 +12,15 @@ data class Collaborator(
     val photoUrl: String? = null,
     val isFavorite: Boolean = false,
     val isOnline: Boolean = false,
+    val pendingName: String? = null,
+    val pendingJobTitle: String? = null,
+    val pendingDepartment: String? = null,
+    val pendingPhone: String? = null,
+    val pendingExtension: String? = null,
+    val pendingEmail: String? = null,
+    val hasPendingChanges: Boolean = false,
 )
+
 
 data class BusinessUnit(
     val id: String,
@@ -44,10 +52,22 @@ val sampleCollaborators = listOf(
 
 val sampleBusinessUnits = listOf(
     BusinessUnit("bu1", "Portugal", "COF PT", "Portugal", 2, BusinessUnitType.UNIT),
-    BusinessUnit("bu2", "Grécia", "COF GR", "Grécia", 1, BusinessUnitType.UNIT),
+    BusinessUnit("bu2", "Portugal", "COF GR", "Portugal", 1, BusinessUnitType.UNIT),
     BusinessUnit("bu3", "Centro de Excelência PT", "CoE PT", "Portugal", 1, BusinessUnitType.FACTORY),
     BusinessUnit("bu4", "Centro de Excelência GR", "CoE GR", "Grécia", 1, BusinessUnitType.FACTORY),
     
     // Office placeholder to populate the Offices tab if clicked
     BusinessUnit("bu5", "Escritório Central Lisboa", "Esc. LIS", "Portugal", 0, BusinessUnitType.OFFICE)
+)
+
+data class DepartmentInfo(
+    val name: String,
+    val collaboratorCount: Int
+)
+
+data class AppUpdateInfo(
+    val latestVersionCode: Int,
+    val latestVersionName: String,
+    val apkUrl: String,
+    val forceUpdate: Boolean
 )
