@@ -6,8 +6,8 @@ import androidx.compose.ui.graphics.Color
 val CoficabBlue = Color(0xFF0D1B3E)       // Azul escuro principal
 val CoficabBlueMid = Color(0xFF1A2D5A)    // Azul médio
 val CoficabBlueSurface = Color(0xFF1E3366) // Superfície azul
-val CoficabYellow = Color(0xFFFFC107)      // Amarelo destaque (aviso offline, CTA)
-val CoficabYellowDark = Color(0xFFE6A800)  // Amarelo escuro (hover/pressed)
+val CoficabYellow = Color(0xFF00A3FF)      // Modificado para Azul Elétrico Coficab (Tema Escuro)
+val CoficabYellowDark = Color(0xFF008CE5)  // Modificado para Azul Elétrico Escuro (hover/pressed)
 
 // === Neutrals ===
 val NeutralWhite = Color(0xFFFFFFFF)
