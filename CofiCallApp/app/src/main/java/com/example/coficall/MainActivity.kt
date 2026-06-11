@@ -129,6 +129,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val readPermission = androidx.core.content.ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.READ_CONTACTS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val writePermission = androidx.core.content.ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.WRITE_CONTACTS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        viewModel.updateContactPermission(readPermission && writePermission)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         try {

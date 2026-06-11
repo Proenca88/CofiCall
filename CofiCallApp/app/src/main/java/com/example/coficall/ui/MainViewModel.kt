@@ -32,6 +32,12 @@ class MainViewModel(private val repository: DataRepository) : ViewModel() {
     var isDarkMode by mutableStateOf(false)
         private set
 
+    var isSyncingContacts by mutableStateOf(false)
+        private set
+
+    var hasContactPermissionState by mutableStateOf(false)
+        private set
+
     init {
         isDarkMode = repository.loadDarkMode()
         checkForUpdates()
@@ -180,6 +186,23 @@ class MainViewModel(private val repository: DataRepository) : ViewModel() {
             }
             onResult(res)
         }
+    }
+
+    fun syncContactsToPhone(onResult: (Result<Unit>) -> Unit) {
+        viewModelScope.launch {
+            isSyncingContacts = true
+            val res = repository.syncContactsToPhone()
+            isSyncingContacts = false
+            onResult(res)
+        }
+    }
+
+    fun clearContactsFromPhone(onResult: (Boolean) -> Unit) {
+        repository.clearContactsFromPhone(onResult)
+    }
+
+    fun updateContactPermission(granted: Boolean) {
+        hasContactPermissionState = granted
     }
 
 

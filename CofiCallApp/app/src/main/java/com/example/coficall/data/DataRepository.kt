@@ -54,6 +54,8 @@ interface DataRepository {
     suspend fun getServerVersionInfo(): Result<com.example.coficall.model.AppUpdateInfo?>
     fun saveDarkMode(enabled: Boolean)
     fun loadDarkMode(): Boolean
+    suspend fun syncContactsToPhone(): Result<Unit>
+    fun clearContactsFromPhone(callback: (Boolean) -> Unit)
 }
 
 
@@ -474,6 +476,7 @@ class DefaultDataRepository(private val context: Context) : DataRepository {
     }
 
     override suspend fun logout() {
+        ContactSyncHelper.removeAccountAndContacts(context) {}
         if (_isMockMode.value) {
             prefs.edit()
                 .putBoolean("mock_logged_in", false)
@@ -977,6 +980,14 @@ class DefaultDataRepository(private val context: Context) : DataRepository {
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun syncContactsToPhone(): Result<Unit> {
+        return ContactSyncHelper.syncContacts(context, _collaborators.value)
+    }
+
+    override fun clearContactsFromPhone(callback: (Boolean) -> Unit) {
+        ContactSyncHelper.removeAccountAndContacts(context, callback)
     }
 }
 

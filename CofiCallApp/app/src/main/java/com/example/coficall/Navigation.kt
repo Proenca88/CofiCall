@@ -222,7 +222,11 @@ fun MainNavigation(viewModel: MainViewModel, onTriggerUpdate: (String) -> Unit) 
                         latestProdVersionName = serverInfoState?.latestVersionName ?: "",
                         latestProdVersionCode = serverInfoState?.latestVersionCode ?: 0,
                         latestProdApkUrl = serverInfoState?.apkUrl ?: "",
-                        onUpdateApkUrl = { url, callback -> viewModel.updateApkUrl(url, callback) }
+                        onUpdateApkUrl = { url, callback -> viewModel.updateApkUrl(url, callback) },
+                        isSyncingContacts = viewModel.isSyncingContacts,
+                        hasContactPermission = viewModel.hasContactPermissionState,
+                        onSyncContacts = { callback -> viewModel.syncContactsToPhone(callback) },
+                        onUpdateContactPermission = { viewModel.updateContactPermission(it) }
                     )
                 }
             },

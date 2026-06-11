@@ -77,6 +77,10 @@ fun SettingsScreen(
     latestProdVersionCode: Int = 0,
     latestProdApkUrl: String = "",
     onUpdateApkUrl: (String, (Result<Unit>) -> Unit) -> Unit = { _, _ -> },
+    isSyncingContacts: Boolean = false,
+    hasContactPermission: Boolean = false,
+    onSyncContacts: (onResult: (Result<Unit>) -> Unit) -> Unit = { _ -> },
+    onUpdateContactPermission: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var showUpdateUrlDialog by remember { mutableStateOf(false) }
@@ -85,6 +89,26 @@ fun SettingsScreen(
     
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val readGranted = permissions[android.Manifest.permission.READ_CONTACTS] == true
+        val writeGranted = permissions[android.Manifest.permission.WRITE_CONTACTS] == true
+        val isGranted = readGranted && writeGranted
+        onUpdateContactPermission(isGranted)
+        if (isGranted) {
+            onSyncContacts { result ->
+                if (result.isSuccess) {
+                    android.widget.Toast.makeText(context, "Contactos sincronizados com sucesso!", android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    android.widget.Toast.makeText(context, "Erro ao sincronizar contactos.", android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        } else {
+            android.widget.Toast.makeText(context, "Permissão de contactos recusada.", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
 
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
@@ -316,7 +340,49 @@ fun SettingsScreen(
                     onClick = { showSyncDialog = true }
                 )
                 
-                // 3. Modo Escuro
+                // 3. Identificação de Chamadas (Sincronização Nativa)
+                SettingsMenuItem(
+                    title = "Identificação de Chamadas",
+                    icon = Icons.Filled.Phone,
+                    iconContainerColor = if (hasContactPermission) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                    iconColor = if (hasContactPermission) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    onClick = {
+                        if (hasContactPermission) {
+                            onSyncContacts { result ->
+                                if (result.isSuccess) {
+                                    android.widget.Toast.makeText(context, "Lista de contactos atualizada com sucesso!", android.widget.Toast.LENGTH_SHORT).show()
+                                } else {
+                                    android.widget.Toast.makeText(context, "Erro ao atualizar contactos.", android.widget.Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        } else {
+                            permissionLauncher.launch(
+                                arrayOf(
+                                    android.Manifest.permission.READ_CONTACTS,
+                                    android.Manifest.permission.WRITE_CONTACTS
+                                )
+                            )
+                        }
+                    },
+                    trailingContent = {
+                        if (isSyncingContacts) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = if (isDark) CoficabYellow else CoficabRoyalBlue
+                            )
+                        } else {
+                            Text(
+                                text = if (hasContactPermission) "Ativo" else "Configurar",
+                                color = if (hasContactPermission) Color(0xFF4CAF50) else Color(0xFFF44336),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                )
+                
+                // 4. Modo Escuro
                 SettingsMenuItem(
                     title = getString("dark_mode"),
                     icon = Icons.Filled.NightsStay,
