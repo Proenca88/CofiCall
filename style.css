@@ -7,8 +7,8 @@
     /* Colors */
     --primary-color: #0A2540; /* Coficab Deep Blue */
     --secondary-color: #004b87; /* Coficab Royal Blue */
-    --accent-color: #FFC72C; /* Coficab Yellow */
-    --accent-color-hover: #E5B220;
+    --accent-color: #00A3FF; /* Coficab Electric Blue */
+    --accent-color-hover: #008CE5;
     
     --bg-dark: #07090E; /* Dark theme default background */
     --bg-card: rgba(255, 255, 255, 0.03); /* Glassmorphism card bg */
@@ -102,7 +102,7 @@ img {
 .btn-primary:hover {
     background-color: var(--accent-color-hover);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 199, 44, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 163, 255, 0.3);
 }
 
 .btn-secondary {
@@ -142,14 +142,14 @@ img {
 
 .badge {
     display: inline-block;
-    background-color: rgba(255, 199, 44, 0.1);
+    background-color: rgba(0, 163, 255, 0.1);
     color: var(--accent-color);
     font-family: var(--font-header);
     font-weight: 600;
     font-size: 0.8rem;
     padding: 6px 16px;
     border-radius: 20px;
-    border: 1px solid rgba(255, 199, 44, 0.2);
+    border: 1px solid rgba(0, 163, 255, 0.2);
     margin-bottom: 24px;
 }
 
@@ -278,7 +278,7 @@ img {
     position: absolute;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(255, 199, 44, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(0, 163, 255, 0.08) 0%, transparent 70%);
     bottom: 50px;
     left: -100px;
     z-index: -1;
@@ -419,8 +419,8 @@ img {
     color: #64B5F6;
 }
 
-.feature-icon.bg-yellow {
-    background-color: rgba(255, 199, 44, 0.15);
+.feature-icon.bg-cyan {
+    background-color: rgba(0, 163, 255, 0.15);
     color: var(--accent-color);
 }
 
@@ -581,7 +581,7 @@ img {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background-color: rgba(255, 199, 44, 0.15);
+    background-color: rgba(0, 163, 255, 0.15);
     color: var(--accent-color);
     font-family: var(--font-header);
     font-weight: 700;
@@ -589,7 +589,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(255, 199, 44, 0.3);
+    border: 1px solid rgba(0, 163, 255, 0.3);
     flex-shrink: 0;
 }
 
