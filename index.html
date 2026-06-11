@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CofiCall - Diretório de Colaboradores Coficab</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="container navbar-container">
+            <div class="logo-area">
+                <img src="assets/logo.png" alt="CofiCall Logo" class="nav-logo">
+                <span class="nav-brand">CofiCall</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#hero">Início</a>
+                <a href="#features">Funcionalidades</a>
+                <a href="#screenshots">Screenshots</a>
+                <a href="#install">Instalação</a>
+                <a href="https://www.dropbox.com/scl/fi/oqcojitk19178p0978v48/CofiCall.apk?rlkey=1fjz0375w14twmj90ezro5gtp&dl=1" class="btn btn-primary btn-nav"><i class="fa-solid fa-download"></i> Descarregar APK</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="Menu de Navegação">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer">
+        <a href="#hero">Início</a>
+        <a href="#features">Funcionalidades</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#install">Instalação</a>
+        <a href="https://www.dropbox.com/scl/fi/oqcojitk19178p0978v48/CofiCall.apk?rlkey=1fjz0375w14twmj90ezro5gtp&dl=1" class="btn btn-primary"><i class="fa-solid fa-download"></i> Descarregar APK</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <span class="badge">Disponível para Android v7.0+</span>
+                <h1>Toda a rede Coficab na palma da sua mão</h1>
+                <p>O CofiCall é a aplicação oficial de diretório de colaboradores. Pesquise contactos, adicione favoritos, sincronize a agenda telefónica e identifique chamadas empresariais de forma rápida e segura.</p>
+                
+                <div class="hero-actions">
+                    <a href="https://www.dropbox.com/scl/fi/oqcojitk19178p0978v48/CofiCall.apk?rlkey=1fjz0375w14twmj90ezro5gtp&dl=1" class="btn btn-primary btn-lg">
+                        <i class="fa-brands fa-android"></i>
+                        <div class="btn-text">
+                            <span class="btn-label">Descarregar para Android</span>
+                            <span class="btn-subtext">CofiCall.apk (19 MB)</span>
+                        </div>
+                    </a>
+                    <a href="#install" class="btn btn-secondary btn-lg">Como Instalar?</a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="phone-mockup-wrapper">
+                    <!-- Dynamic Phone Border -->
+                    <div class="phone-mockup">
+                        <img src="assets/screen-home.png" alt="CofiCall Ecrã Principal" class="mockup-img active" id="mockup-screen">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Funcionalidades Inteligentes</h2>
+                <p>Criado para aproximar equipas e otimizar a comunicação diária nas nossas unidades industriais e escritórios.</p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Card 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon bg-blue">
+                        <i class="fa-solid fa-address-book"></i>
+                    </div>
+                    <h3>Diretório Global</h3>
+                    <p>Pesquise colaboradores por nome, empresa, departamento ou cargo. Aceda aos dados em qualquer lado, mesmo em modo offline.</p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon bg-yellow">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <h3>Contactos Favoritos</h3>
+                    <p>Marque os seus colegas mais frequentes como favoritos para ter acesso instantâneo ao ecrã de perfil e chamadas num só toque.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon bg-green">
+                        <i class="fa-solid fa-phone-volume"></i>
+                    </div>
+                    <h3>Identificação de Chamadas</h3>
+                    <p>Sincronize a lista de colaboradores com o telemóvel. Identifique quem telefona com o nome e departamento na tela de chamada nativa.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon bg-purple">
+                        <i class="fa-solid fa-moon"></i>
+                    </div>
+                    <h3>Modo Escuro & Idiomas</h3>
+                    <p>Interface moderna adaptada a temas claro e escuro. Disponível em vários idiomas (Português, Inglês, Francês, Espanhol, Árabe).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Carousel Section -->
+    <section id="screenshots" class="screenshots-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Interface Moderna e Premium</h2>
+                <p>Capturas de ecrã reais da aplicação desenhada com base nas diretrizes modernas do Material Design 3 e Jetpack Compose.</p>
+            </div>
+
+            <!-- Carousel Component -->
+            <div class="carousel-wrapper">
+                <div class="carousel-track">
+                    <div class="carousel-slide">
+                        <img src="assets/screen-home.png" alt="Ecrã Principal CofiCall">
+                        <h4>Ecrã Inicial</h4>
+                        <p>Visão geral rápida, contagem de colaboradores e atalhos rápidos.</p>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="assets/screen-directory-dark.png" alt="Diretório de Colaboradores em Modo Escuro">
+                        <h4>Diretório (Modo Escuro)</h4>
+                        <p>Pesquisa refinada de colaboradores com design glassmorphic premium.</p>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="assets/screen-settings.png" alt="Definições da Aplicação e Administração">
+                        <h4>Definições e Admin</h4>
+                        <p>Configuração do Modo Escuro, sincronização offline e gestão de atualizações.</p>
+                    </div>
+                </div>
+                
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev-btn" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="carousel-dots"></div>
+                    <button class="carousel-btn next-btn" aria-label="Seguinte"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation & QR Section -->
+    <section id="install" class="install-section">
+        <div class="container install-container">
+            <div class="install-steps">
+                <h2>Como Instalar a Aplicação?</h2>
+                <p>Tratando-se de uma aplicação interna distribuída em formato APK, necessita de efetuar a instalação de forma manual no seu telemóvel Android:</p>
+                
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-desc">
+                            <h4>Descarregue o APK</h4>
+                            <p>Clique no botão de download a partir do seu telemóvel ou aponte a câmara para o código QR.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-desc">
+                            <h4>Permita Fontes Desconhecidas</h4>
+                            <p>Ao abrir o ficheiro, se o Android alertar sobre segurança, vá a Definições no aviso e marque **"Permitir desta fonte"**.</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-desc">
+                            <h4>Instale e Inicie Sessão</h4>
+                            <p>Clique em **Instalar**, aguarde a conclusão e abra a app CofiCall. Introduza o seu e-mail empresarial para aceder!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="install-qr">
+                <div class="qr-card">
+                    <h3>Download Imediato</h3>
+                    <p>Aponte a câmara do telemóvel para o código QR abaixo para descarregar o APK diretamente no dispositivo.</p>
+                    <div class="qr-code-wrapper">
+                        <!-- Dynamic QR Code API from qrserver.com -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fwww.dropbox.com%2Fscl%2Ffi%2Foqcojitk19178p0978v48%2FCofiCall.apk%3Frlkey%3D1fjz0375w14twmj90ezro5gtp%26dl%3D1" alt="QR Code para Download" class="qr-code">
+                    </div>
+                    <span class="qr-hint">Compatível com Android 7.0 (Nougat) ou superior</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <img src="assets/logo.png" alt="CofiCall Logo" class="footer-logo">
+                <div>
+                    <span class="footer-title">CofiCall</span>
+                    <p class="footer-subtitle">Gestão de Contactos & Colaboradores</p>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2026 Coficab Group. Todos os direitos reservados.</p>
+                <p class="footer-dev">Desenvolvido para uso interno corporativo.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>
