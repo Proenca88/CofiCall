@@ -115,16 +115,8 @@ class DefaultDataRepository(private val context: Context) : DataRepository {
             _isMockMode.value = false
             val auth = FirebaseAuth.getInstance()
             
-            // Forçar logout na inicialização para exigir sempre login/registo
-            try {
-                auth.signOut()
-            } catch (e: Exception) {
-                Log.e("CofiCallDebug", "Erro ao fazer signOut na inicialização", e)
-            }
-            
-            _isLoggedIn.value = false
-            _currentUserEmail.value = null
-            _isInitializing.value = false
+            _isLoggedIn.value = auth.currentUser != null
+            _currentUserEmail.value = auth.currentUser?.email
             
             auth.addAuthStateListener { firebaseAuth ->
                 val user = firebaseAuth.currentUser
