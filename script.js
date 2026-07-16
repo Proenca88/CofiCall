@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileMenu();
     initCarousel();
     initHeroAnimation();
+    fetchApkSize();
 });
 
 /**
@@ -251,4 +252,30 @@ function initHeroAnimation() {
         }, 400);
 
     }, 7000); // Rotates every 7 seconds
+}
+
+/**
+ * Consulta a API do GitHub para obter o tamanho real do ficheiro CofiCall.apk e atualiza o botão
+ */
+function fetchApkSize() {
+    const subtextEl = document.querySelector('.btn-subtext');
+    if (!subtextEl) return;
+
+    // Fazer pedido à API pública do GitHub para ler metadados do APK
+    fetch('https://api.github.com/repos/Proenca88/CofiCall/contents/CofiCall.apk')
+        .then(response => {
+            if (!response.ok) throw new Error('Falha ao aceder à API do GitHub');
+            return response.json();
+        })
+        .then(data => {
+            if (data.size) {
+                // Converter bytes para Megabytes (MB) com 1 casa decimal
+                const sizeInMb = (data.size / (1024 * 1024)).toFixed(1);
+                subtextEl.textContent = `CofiCall.apk (${sizeInMb} MB)`;
+                console.log(`Tamanho do APK atualizado de forma dinâmica: ${sizeInMb} MB`);
+            }
+        })
+        .catch(err => {
+            console.warn('Não foi possível obter o tamanho dinâmico do APK. Usando valor padrão.', err);
+        });
 }
