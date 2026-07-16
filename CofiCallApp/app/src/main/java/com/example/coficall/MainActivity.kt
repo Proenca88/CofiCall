@@ -42,6 +42,32 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
+        // Configurar o ImageLoader global do Coil para ignorar validações de certificados SSL (bypass SSL)
+        try {
+            val trustAllCerts = arrayOf<javax.net.ssl.TrustManager>(object : javax.net.ssl.X509TrustManager {
+                override fun checkClientTrusted(chain: Array<out java.security.cert.X509Certificate>?, authType: String?) {}
+                override fun checkServerTrusted(chain: Array<out java.security.cert.X509Certificate>?, authType: String?) {}
+                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> = arrayOf()
+            })
+
+            val sslContext = javax.net.ssl.SSLContext.getInstance("SSL")
+            sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+
+            val okHttpClient = okhttp3.OkHttpClient.Builder()
+                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as javax.net.ssl.X509TrustManager)
+                .hostnameVerifier { _, _ -> true }
+                .build()
+
+            val imageLoader = coil.ImageLoader.Builder(this)
+                .okHttpClient(okHttpClient)
+                .build()
+
+            coil.Coil.setImageLoader(imageLoader)
+            android.util.Log.d("CofiCallDebug", "Coil ImageLoader com bypass de SSL configurado com sucesso")
+        } catch (e: Exception) {
+            android.util.Log.e("CofiCallDebug", "Erro ao configurar Coil com bypass de SSL", e)
+        }
+
         android.util.Log.d("CofiCallDebug", "MainActivity onCreate iniciado")
         repository = DefaultDataRepository(applicationContext)
         android.util.Log.d("CofiCallDebug", "MainActivity: Repositório criado")
