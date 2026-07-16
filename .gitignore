@@ -18,3 +18,7 @@ local.properties
 debug.keystore
 jdk17/
 jdk17.zip
+phonelist.html
+phonelist_files/
+build_output*.txt
+build_coficallapp.txt

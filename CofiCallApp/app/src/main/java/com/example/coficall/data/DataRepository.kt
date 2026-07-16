@@ -322,6 +322,10 @@ class DefaultDataRepository(private val context: Context) : DataRepository {
                     val phone = parts[2].trim()
                     val department = parts[3].trim()
                     val site = parts[4].trim()
+                    val photoUrl = if (parts.size >= 6) {
+                        val url = parts[5].trim()
+                        if (url.isEmpty() || url == "null") null else url
+                    } else null
                     
                     val email = generateEmailFromName(name)
                     val docId = email.replace("@coficab.com", "").replace(".", "_")
@@ -335,7 +339,7 @@ class DefaultDataRepository(private val context: Context) : DataRepository {
                         phone = if (phone == "0" || phone.isEmpty() || phone == "null") null else phone,
                         extension = if (extension == "0" || extension.isEmpty() || extension == "null") null else extension,
                         email = email,
-                        photoUrl = null,
+                        photoUrl = photoUrl,
                         isFavorite = false,
                         isOnline = (i % 7 == 0)
                     )
