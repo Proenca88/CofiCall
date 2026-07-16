@@ -42,6 +42,8 @@ class MainViewModel(private val repository: DataRepository) : ViewModel() {
         isDarkMode = repository.loadDarkMode()
         checkForUpdates()
         loadServerVersionInfo()
+        // Forçar sincronização online com o Firebase no arranque da aplicação
+        refresh()
     }
 
     fun updateLanguage(lang: String) {
