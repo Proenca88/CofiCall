@@ -37,7 +37,7 @@ interface DataRepository {
     suspend fun register(email: String, password: String): Result<Unit>
     suspend fun logout()
     suspend fun toggleFavorite(collaborator: Collaborator)
-    suspend fun refreshData()
+    suspend fun refreshData(): Result<Unit>
     suspend fun updateCollaboratorPhoto(collaboratorId: String, photoUrl: String): Result<Unit>
     suspend fun updateCollaboratorProfile(collaborator: Collaborator): Result<Unit>
     fun updateLanguage(lang: String)
@@ -505,9 +505,10 @@ class DefaultDataRepository(private val context: Context) : DataRepository {
         }
     }
 
-    override suspend fun refreshData() {
-        if (_isMockMode.value) {
+    override suspend fun refreshData(): Result<Unit> {
+        return if (_isMockMode.value) {
             loadMockData()
+            Result.success(Unit)
         } else {
             try {
                 val db = FirebaseFirestore.getInstance()
@@ -519,9 +520,11 @@ class DefaultDataRepository(private val context: Context) : DataRepository {
                     .await()
                 _isOfflineMode.value = false
                 Log.d("CofiCallDebug", "refreshData: Sincronizacao com Firebase bem-sucedida do servidor.")
+                Result.success(Unit)
             } catch (e: Exception) {
                 Log.e("CofiCallDebug", "refreshData: Falha na sincronizacao online (offline)", e)
                 _isOfflineMode.value = true
+                Result.failure(e)
             }
         }
     }

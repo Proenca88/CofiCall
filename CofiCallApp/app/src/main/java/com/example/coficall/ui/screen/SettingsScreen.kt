@@ -64,6 +64,7 @@ fun SettingsScreen(
     onUpdatePhoto: (String, String) -> Unit = { _, _ -> },
     onUpdateProfile: (Collaborator) -> Unit = {},
     onRefresh: () -> Unit = {},
+    onRefreshWithResult: (onResult: (Result<Unit>) -> Unit) -> Unit = { _ -> },
     onRepopulateDb: () -> Unit = {},
     onApproveProfile: (String) -> Unit = {},
     onRejectProfile: (String) -> Unit = {},
@@ -201,7 +202,16 @@ fun SettingsScreen(
                     onClick = if (isOffline || isMockMode) {
                         {
                             scope.launch {
-                                onRefresh()
+                                onRefreshWithResult { result ->
+                                    result.fold(
+                                        onSuccess = {
+                                            android.widget.Toast.makeText(context, "Sincronização com o servidor concluída!", android.widget.Toast.LENGTH_SHORT).show()
+                                        },
+                                        onFailure = { error ->
+                                            android.widget.Toast.makeText(context, "Falha de ligação: ${error.localizedMessage}", android.widget.Toast.LENGTH_LONG).show()
+                                        }
+                                    )
+                                }
                             }
                         }
                     } else null

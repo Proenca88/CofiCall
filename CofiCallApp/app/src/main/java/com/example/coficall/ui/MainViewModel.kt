@@ -220,9 +220,10 @@ class MainViewModel(private val repository: DataRepository) : ViewModel() {
         }
     }
 
-    fun refresh() {
+    fun refresh(onResult: (Result<Unit>) -> Unit = {}) {
         viewModelScope.launch {
-            repository.refreshData()
+            val res = repository.refreshData()
+            onResult(res)
         }
     }
 

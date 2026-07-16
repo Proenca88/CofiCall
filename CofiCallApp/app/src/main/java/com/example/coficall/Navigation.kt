@@ -210,6 +210,7 @@ fun MainNavigation(viewModel: MainViewModel, onTriggerUpdate: (String) -> Unit) 
                         onUpdatePhoto = { colabId, base64 -> viewModel.updateCollaboratorPhoto(colabId, base64) },
                         onUpdateProfile = { updatedColab -> viewModel.updateCollaboratorProfile(updatedColab) },
                         onRefresh = { viewModel.refresh() },
+                        onRefreshWithResult = { callback -> viewModel.refresh(callback) },
                         onRepopulateDb = { viewModel.repopulateDatabase() },
                         onApproveProfile = { viewModel.approveProfileUpdate(it) },
                         onRejectProfile = { viewModel.rejectProfileUpdate(it) },
